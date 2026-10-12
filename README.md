@@ -33,7 +33,7 @@ Items are marked ✅ only after they are implemented and verified by tests.
 - Node.js 20+
 - PostgreSQL 15+ (create a database and user matching `.env`)
 
-## Setup (available after Phase 2)
+## Setup 
 
 ```bash
 cp .env.example .env            # then edit values
