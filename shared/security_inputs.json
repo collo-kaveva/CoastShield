@@ -1,0 +1,300 @@
+{
+ "_comment": "Shared reference cases. 'expected' was recorded from the TypeScript reference engine (Phase 1) and reviewed; both the TypeScript and Python engines must reproduce risk and the ordered indicator ids exactly.",
+ "cases": [
+  {
+   "id": "fake-reversal",
+   "kind": "message",
+   "input": "Confirmed. Ksh 4,500.00 has been sent to your M-PESA by mistake. Please send it back to 0700 000 123 urgently. Thank you."
+  },
+  {
+   "id": "account-link",
+   "kind": "message",
+   "input": "SAFARICOM ALERT: Your M-PESA account will be suspended within 24 hours. Verify now: http://safaricom-verify-account.xyz/login"
+  },
+  {
+   "id": "remote-access",
+   "kind": "message",
+   "input": "Hello, this is bank support. There is a problem with your account. Please install AnyDesk so we can fix it, and confirm your PIN to verify you."
+  },
+  {
+   "id": "prize",
+   "kind": "message",
+   "input": "Congratulations! You have won KES 250,000 in the Mombasa Shopper lottery. Pay KES 1,500 registration fee to claim your prize: 0700 000 456."
+  },
+  {
+   "id": "customer-claim",
+   "kind": "message",
+   "input": "Hi, I have paid for the 3kg kingfish. Confirmed. Ksh 2,700.00 sent to Fatuma Said. Please release the order, I'm outside."
+  },
+  {
+   "id": "safety-tip",
+   "kind": "message",
+   "input": "Never share your M-PESA PIN with anyone. We will never ask for it."
+  },
+  {
+   "id": "ordinary",
+   "kind": "message",
+   "input": "Hi Fatuma, your tailoring order is ready for pickup tomorrow after 10am. Thanks!"
+  },
+  {
+   "id": "pin-only",
+   "kind": "message",
+   "input": "Please confirm your PIN"
+  },
+  {
+   "id": "otp-ask",
+   "kind": "message",
+   "input": "Kindly send me the OTP you just received so I can finish your refund."
+  },
+  {
+   "id": "otp-warning",
+   "kind": "message",
+   "input": "Your OTP is 482913. Do not share it with anyone, including our staff."
+  },
+  {
+   "id": "urgency-only",
+   "kind": "message",
+   "input": "You must act now, this offer expires today."
+  },
+  {
+   "id": "parcel-link",
+   "kind": "message",
+   "input": "Your parcel delivery failed. Verify your address at www.dhl-track-parcel.top to reschedule."
+  },
+  {
+   "id": "bank-link-genuine",
+   "kind": "message",
+   "input": "KCB: your statement is ready at https://kcbgroup.com/statements"
+  },
+  {
+   "id": "bank-link-fake",
+   "kind": "message",
+   "input": "KCB URGENT: account locked. Log in at https://kcb-secure-login.click/verify immediately"
+  },
+  {
+   "id": "shortener",
+   "kind": "message",
+   "input": "Claim your reward now https://bit.ly/3abcXYZ"
+  },
+  {
+   "id": "email-address",
+   "kind": "message",
+   "input": "Contact us at support@gmail.com for help with your order."
+  },
+  {
+   "id": "empty-ish",
+   "kind": "message",
+   "input": "   "
+  },
+  {
+   "id": "unicode-mix",
+   "kind": "message",
+   "input": "Habari 😀 مرحبا your delivery is on the way, asante sana"
+  },
+  {
+   "id": "html",
+   "kind": "message",
+   "input": "<script>alert(1)</script> send your password now"
+  },
+  {
+   "id": "tv-code",
+   "kind": "message",
+   "input": "Install the app and share your screen so we can help."
+  },
+  {
+   "id": "till-request",
+   "kind": "message",
+   "input": "Please pay KES 500 to till 123456 for your booking today."
+  },
+  {
+   "id": "mistaken-no-brand",
+   "kind": "message",
+   "input": "I sent KES 2,000 to your number by mistake, please return it."
+  },
+  {
+   "id": "jumia",
+   "kind": "message",
+   "input": "Jumia: your order is on hold, update your details at http://jumia-orders.top/update urgently"
+  },
+  {
+   "id": "generic-thanks",
+   "kind": "message",
+   "input": "Thanks for shopping with us! Your order CS-ABC234 is confirmed."
+  },
+  {
+   "id": "u-brand-lookalike",
+   "kind": "url",
+   "input": "http://safaricom-verify-account.xyz/login"
+  },
+  {
+   "id": "u-genuine",
+   "kind": "url",
+   "input": "https://www.safaricom.co.ke"
+  },
+  {
+   "id": "u-subdomain-trick",
+   "kind": "url",
+   "input": "https://safaricom.co.ke.evil-site.top/login"
+  },
+  {
+   "id": "u-ip-private",
+   "kind": "url",
+   "input": "http://192.168.0.15/pay"
+  },
+  {
+   "id": "u-ip-public",
+   "kind": "url",
+   "input": "http://8.8.8.8/login"
+  },
+  {
+   "id": "u-ip-integer",
+   "kind": "url",
+   "input": "http://2130706433/admin"
+  },
+  {
+   "id": "u-metadata",
+   "kind": "url",
+   "input": "http://169.254.169.254/latest/meta-data/"
+  },
+  {
+   "id": "u-localhost",
+   "kind": "url",
+   "input": "http://localhost:8000/admin"
+  },
+  {
+   "id": "u-shortener",
+   "kind": "url",
+   "input": "https://bit.ly/3abcXYZ"
+  },
+  {
+   "id": "u-userinfo",
+   "kind": "url",
+   "input": "https://safaricom.co.ke@evil.example.com/"
+  },
+  {
+   "id": "u-punycode",
+   "kind": "url",
+   "input": "https://xn--sfaricom-q4a.com"
+  },
+  {
+   "id": "u-javascript",
+   "kind": "url",
+   "input": "javascript:alert(1)"
+  },
+  {
+   "id": "u-data",
+   "kind": "url",
+   "input": "data:text/html,<b>x</b>"
+  },
+  {
+   "id": "u-file",
+   "kind": "url",
+   "input": "file:///etc/passwd"
+  },
+  {
+   "id": "u-ftp",
+   "kind": "url",
+   "input": "ftp://example.com"
+  },
+  {
+   "id": "u-gopher",
+   "kind": "url",
+   "input": "gopher://example.com:70/"
+  },
+  {
+   "id": "u-empty",
+   "kind": "url",
+   "input": ""
+  },
+  {
+   "id": "u-spaces",
+   "kind": "url",
+   "input": "   "
+  },
+  {
+   "id": "u-scheme-only",
+   "kind": "url",
+   "input": "http://"
+  },
+  {
+   "id": "u-bad-chars",
+   "kind": "url",
+   "input": "not a url"
+  },
+  {
+   "id": "u-script-tag",
+   "kind": "url",
+   "input": "<script>"
+  },
+  {
+   "id": "u-too-long",
+   "kind": "url",
+   "input": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  {
+   "id": "u-no-scheme",
+   "kind": "url",
+   "input": "example.com/path"
+  },
+  {
+   "id": "u-http-plain",
+   "kind": "url",
+   "input": "http://example.com"
+  },
+  {
+   "id": "u-odd-tld",
+   "kind": "url",
+   "input": "https://free-prizes.xyz"
+  },
+  {
+   "id": "u-port",
+   "kind": "url",
+   "input": "https://example.com:8443/x"
+  },
+  {
+   "id": "u-many-labels",
+   "kind": "url",
+   "input": "https://a.b.c.d.example.com"
+  },
+  {
+   "id": "u-hyphens",
+   "kind": "url",
+   "input": "https://pay-now-secure-wallet.com"
+  },
+  {
+   "id": "u-login-words",
+   "kind": "url",
+   "input": "https://secure-login-update.com"
+  },
+  {
+   "id": "u-no-dot",
+   "kind": "url",
+   "input": "http://intranet/"
+  },
+  {
+   "id": "u-ipv6",
+   "kind": "url",
+   "input": "http://[::1]/"
+  },
+  {
+   "id": "u-equity-fake",
+   "kind": "url",
+   "input": "https://equity-bank-login.top"
+  },
+  {
+   "id": "u-genuine-kcb",
+   "kind": "url",
+   "input": "https://kcbgroup.com/login"
+  },
+  {
+   "id": "u-trailing-dot",
+   "kind": "url",
+   "input": "https://example.com./"
+  },
+  {
+   "id": "u-uppercase",
+   "kind": "url",
+   "input": "HTTPS://WWW.SAFARICOM.CO.KE/"
+  }
+ ]
+}

@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { @apply bg-sand-50 text-ocean-900 antialiased font-sans; }
+  h1, h2, h3 { @apply font-display tracking-tight; }
+  :focus-visible { outline: 3px solid #1BA79A; outline-offset: 2px; border-radius: 6px; }
+  dialog::backdrop { background: rgba(11, 37, 69, 0.6); }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; animation: none !important; }
+  }
+}
+
+@layer components {
+  .card { @apply min-w-0 rounded-2xl border border-sand-200 bg-white shadow-card; }
+  .field-input {
+    @apply block w-full min-h-[44px] rounded-xl border border-ocean-200 bg-white px-3.5 py-2.5 text-base text-ocean-900 placeholder:text-ocean-400 transition-colors;
+  }
+  .field-input[aria-invalid="true"] { @apply border-coral-500; }
+  .field-input:disabled { @apply bg-sand-100 text-ocean-500; }
+}
