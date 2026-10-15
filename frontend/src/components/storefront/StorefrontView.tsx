@@ -47,11 +47,11 @@ export function StorefrontView({ business, items, mode, draftNotice }: Props) {
           <h3 className="text-lg font-bold">About us</h3>
           <p className="mt-1.5 text-ocean-700">{business.description || "Your short description will appear here."}</p>
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-            <div className="flex items-start gap-2"><Clock className="mt-0.5 h-4 w-4 text-lagoon-700" aria-hidden /><div><dt className="sr-only">Opening hours</dt><dd>{summariseHours(business.hours)}</dd></div></div>
-            {business.publicAddress && <div className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 text-lagoon-700" aria-hidden /><div><dt className="sr-only">Address</dt><dd>{business.publicAddress}</dd></div></div>}
-            {business.phone && <div className="flex items-start gap-2"><Phone className="mt-0.5 h-4 w-4 text-lagoon-700" aria-hidden /><div><dt className="sr-only">Phone</dt><dd><a className="underline" href={`tel:${business.phone.replace(/\s/g, "")}`}>{business.phone}</a></dd></div></div>}
-            {business.whatsapp && <div className="flex items-start gap-2"><MessageSquareText className="mt-0.5 h-4 w-4 text-lagoon-700" aria-hidden /><div><dt className="sr-only">WhatsApp</dt><dd>WhatsApp {business.whatsapp}</dd></div></div>}
-            {business.email && <div className="flex items-start gap-2"><Mail className="mt-0.5 h-4 w-4 text-lagoon-700" aria-hidden /><div><dt className="sr-only">Email</dt><dd><a className="underline" href={`mailto:${business.email}`}>{business.email}</a></dd></div></div>}
+            <div className="flex items-start gap-2"><dt><Clock className="mt-0.5 h-4 w-4 text-lagoon-700" aria-hidden /><span className="sr-only">Opening hours</span></dt><dd>{summariseHours(business.hours)}</dd></div>
+            {business.publicAddress && <div className="flex items-start gap-2"><dt><MapPin className="mt-0.5 h-4 w-4 text-lagoon-700" aria-hidden /><span className="sr-only">Address</span></dt><dd>{business.publicAddress}</dd></div>}
+            {business.phone && <div className="flex items-start gap-2"><dt><Phone className="mt-0.5 h-4 w-4 text-lagoon-700" aria-hidden /><span className="sr-only">Phone</span></dt><dd><a className="underline" href={`tel:${business.phone.replace(/\s/g, "")}`}>{business.phone}</a></dd></div>}
+            {business.whatsapp && <div className="flex items-start gap-2"><dt><MessageSquareText className="mt-0.5 h-4 w-4 text-lagoon-700" aria-hidden /><span className="sr-only">WhatsApp</span></dt><dd>WhatsApp {business.whatsapp}</dd></div>}
+            {business.email && <div className="flex items-start gap-2"><dt><Mail className="mt-0.5 h-4 w-4 text-lagoon-700" aria-hidden /><span className="sr-only">Email</span></dt><dd><a className="underline" href={`mailto:${business.email}`}>{business.email}</a></dd></div>}
           </dl>
         </section>
 

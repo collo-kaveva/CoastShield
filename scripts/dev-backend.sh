@@ -4,4 +4,5 @@ cd "$(dirname "$0")/../backend"
 [ -d .venv ] || python3 -m venv .venv
 .venv/bin/pip install -q -r requirements.txt
 .venv/bin/python manage.py migrate
+.venv/bin/python manage.py createcachetable
 .venv/bin/python manage.py runserver 8000

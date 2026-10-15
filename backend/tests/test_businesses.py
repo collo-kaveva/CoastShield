@@ -113,3 +113,10 @@ def test_unpublish_removes_from_public(anon, owner_client, owner):
     assert anon.get(f"/api/v1/storefronts/{b.slug}/").status_code == 200
     owner_client.post("/api/v1/business/me/unpublish/")
     assert anon.get(f"/api/v1/storefronts/{b.slug}/").status_code == 404
+
+
+def test_missing_resources_use_a_generic_message_but_deliberate_ones_are_kept(anon, owner_client):
+    r = anon.get("/api/v1/nonexistent/")
+    assert r.status_code == 404 and r["Content-Type"].startswith("application/json") and r.json()["error"]["code"] == "not_found"
+    assert anon.get("/api/v1/storefronts/nope/").json()["error"]["message"] == "This storefront is not available."
+    assert owner_client.get("/api/v1/business/me/").json()["error"]["message"] == "You have not created a business profile yet."

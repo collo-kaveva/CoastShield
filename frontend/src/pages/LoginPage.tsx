@@ -24,7 +24,7 @@ export default function LoginPage() {
 
   const go = async (v: Values) => {
     setError(null);
-    try { const u = await login.mutateAsync(v); toast(`Welcome back, ${u.name.split(" ")[0]}.`); nav(dest, { replace: true }); }
+    try { const u = await login.mutateAsync(v); toast(`Welcome back, ${u.name.split(" ")[0]}.`); nav(u.role === "ADMIN" ? "/admin" : dest, { replace: true }); }
     catch (e) { setError(errorMessage(e)); }
   };
 

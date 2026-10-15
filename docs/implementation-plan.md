@@ -54,10 +54,24 @@ Also built (ahead of Phase 3, because the models and the UI needed them): per-us
 Also built: analysis history with clear-all, incident guidance served by the API, validated logo upload and storefront display, `purge_analyses` command.
 **Gaps:** rule set is small and English/Swahili-light; no reputation provider (deliberately); uploads served by Django only in DEBUG; per-process throttle cache; customer lookup screen and admin screen still not built; only Chromium tested.
 
-## Phase 4: End-to-end testing, hardening, demo  ⬜
-- [ ] Full workflow against real backend; security, accessibility and responsive testing
-- [ ] Clean-database migrations; setup verified from scratch
-- [ ] Demo data, reset command, demo script, known limitations
+## Phase 4: End-to-end testing, hardening, demo  ✅ complete (with listed gaps)
+| Acceptance criterion | Status | How verified |
+|---|---|---|
+| Complete main workflow works against the real backend and database | ✅ | `scripts/e2e_demo.py`: all 17 checks in ~40 s (register → publish → QR → customer order → track → accept → ready → manual payment → complete → suspicious message → admin) |
+| Relevant tests pass | ✅ | 222 backend (PostgreSQL) + 143 frontend; Phase 2 and 3 integration scripts re-run green on the final code |
+| Setup instructions reproducible | ✅ | Followed literally in a fresh directory with a new virtualenv, new role/database and `npm ci`: migrations from empty DB, seed, all tests, build. **Found and fixed a real bug** (`setup-db.sh` broke on the characters Django's secret-key generator produces) |
+| Demo does not depend on unavailable paid services | ✅ | E2E records every request host: only the app's own origin; no external fonts, CDNs or APIs |
+| Security testing (cross-user, draft privacy, invalid input, invalid transitions, duplicates, auth failures, malformed URLs, rate limiting, customer privacy, audit permissions) | ✅ | See the matrix in `docs/testing-plan.md` |
+| Accessibility, keyboard and layouts (mobile, tablet, desktop) | 🟡 | axe-core WCAG 2.1 A/AA: **0 violations across 66 page×size combinations** after fixing 3 real issues; 13 keyboard/focus checks pass. No manual screen-reader testing |
+| Migrations from a clean database; env/config verified | ✅ | Fresh DB; `check --deploy` clean; production-flag tests run the real settings with `DEBUG=False` |
+| Dependencies reviewed; no exposed secrets; dev-only config checked | ✅ | pip-audit clean (upgraded Pillow, pytest); npm: 0 vulnerabilities in shipped code (see accepted dev-tool advisories); secret scan; demo credentials absent from production bundle |
+| Demo prepared (sample data, script, reset, limitations) | ✅ | `docs/demo-script.md`, `scripts/demo-reset.sh` |
+
+### Gaps closed in Phase 4 (previously listed)
+Shared (database) throttle cache and proxy-aware client IPs; customer "track a request" screen; restricted admin screen; production configuration tested; complete OpenAPI schema (0 warnings); JSON errors for unknown API URLs and oversized bodies.
+
+### Remaining gaps (honest list)
+See "Known limitations" in `README.md`. In short: no real-TLS/reverse-proxy deployment was tested; no deployment guide or WSGI server pinned; password reset sends no email; no owner notifications; no account deletion/data-export screen or customer-data retention policy; no manual screen-reader or non-Chromium testing; Tailwind 3 build-chain advisories (dev only).
 
 ## Decisions made for Phase 2 (defaults applied)
 1. **Auth:** session cookie + CSRF behind the Vite `/api` proxy (recommended).

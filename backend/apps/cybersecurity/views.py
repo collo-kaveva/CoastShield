@@ -1,7 +1,8 @@
 from django.db import transaction
 from rest_framework.generics import ListAPIView
 from rest_framework.throttling import ScopedRateThrottle
-from drf_spectacular.utils import extend_schema, inline_serializer
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
@@ -81,11 +82,13 @@ class AnalysisView(APIView):
         return Response(result)
 
 
+@extend_schema_view(post=extend_schema(request=MessageBody, responses=OpenApiTypes.OBJECT))
 class AnalyzeMessageView(AnalysisView):
     def run(self, value):
         return analyze_message(value)
 
 
+@extend_schema_view(post=extend_schema(request=UrlBody, responses=OpenApiTypes.OBJECT))
 class CheckUrlView(AnalysisView):
     body_class = UrlBody
     field = "url"
@@ -95,7 +98,9 @@ class CheckUrlView(AnalysisView):
         return analyze_url(value)
 
 
+@extend_schema_view(get=extend_schema(responses=OpenApiTypes.OBJECT), delete=extend_schema(request=None, responses={204: None}))
 class AnalysisHistoryView(ListAPIView):
+    serializer_class = serializers.Serializer
     """Own history only: kind, risk, rule labels and time. There is no text to return because none is kept."""
 
     def get_queryset(self):
@@ -112,6 +117,7 @@ class AnalysisHistoryView(ListAPIView):
         return Response(status=204)
 
 
+@extend_schema_view(get=extend_schema(responses=OpenApiTypes.OBJECT))
 class IncidentGuidesView(APIView):
     def get(self, request):
         return Response(INCIDENT_GUIDES)

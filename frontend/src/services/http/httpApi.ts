@@ -2,7 +2,7 @@
 import type { Api } from "../types";
 import { ApiError } from "../errors";
 import { fetchAll, request } from "./client";
-import type { AnalysisHistoryItem, Business, IncidentGuide, MessageAnalysis, UrlAnalysis, CatalogItem, ChecklistItem, DashboardSummary, Order, PublicBusiness, Storefront, User } from "@/types";
+import type { AnalysisHistoryItem, AuditEvent, OrderLookupResult, Business, IncidentGuide, MessageAnalysis, UrlAnalysis, CatalogItem, ChecklistItem, DashboardSummary, Order, PublicBusiness, Storefront, User } from "@/types";
 
 export const httpApi: Api = {
   auth: {
@@ -45,6 +45,7 @@ export const httpApi: Api = {
     get: (id) => request<Order>("GET", `/orders/${id}/`),
     transition: (id, to) => request<Order>("POST", `/orders/${id}/transition/`, { to }),
     setPayment: (id, status) => request<Order>("POST", `/orders/${id}/payment/`, { status }),
+    lookup: (reference, contact) => request<OrderLookupResult>("POST", "/orders/lookup/", { reference, contact }),
   },
   security: {
     // Authoritative analysis runs on the server. The text is analysed in memory there and never stored.
@@ -57,5 +58,13 @@ export const httpApi: Api = {
     clearHistory: async () => { await request<void>("DELETE", "/security/analyses/"); },
   },
   dashboard: { summary: () => request<DashboardSummary>("GET", "/dashboard/summary/") },
+  admin: {
+    auditEvents: async ({ action, page = 1 }) => {
+      const p = new URLSearchParams({ page: String(page), page_size: "25" });
+      if (action) p.set("action", action);
+      const r = await request<{ count: number; next: string | null; previous: string | null; results: AuditEvent[] }>("GET", `/audit/events/?${p}`);
+      return { count: r.count, page, hasNext: !!r.next, hasPrevious: !!r.previous, results: r.results };
+    },
+  },
   demo: { reset: async () => { throw new ApiError("Resetting is only available in demo mode.", 400); } },
 };

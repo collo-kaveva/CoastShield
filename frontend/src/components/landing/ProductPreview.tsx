@@ -42,7 +42,7 @@ export function ProductPreview() {
       <div className="flex items-center justify-between gap-3 border-b border-sand-200 bg-sand-50 px-4 py-3">
         <div role="tablist" aria-label="Product preview" className="flex gap-1" onKeyDown={onKey}>
           {TABS.map((t) => (
-            <button key={t.id} ref={(el) => { refs.current[t.id] = el; }} role="tab" id={`tab-${t.id}`} aria-selected={tab === t.id} aria-controls={`panel-${t.id}`} tabIndex={tab === t.id ? 0 : -1} onClick={() => setTab(t.id)}
+            <button key={t.id} ref={(el) => { refs.current[t.id] = el; }} role="tab" aria-label={t.label} id={`tab-${t.id}`} aria-selected={tab === t.id} aria-controls={`panel-${t.id}`} tabIndex={tab === t.id ? 0 : -1} onClick={() => setTab(t.id)}
               className={cn("flex min-h-[44px] items-center gap-2 rounded-lg px-3 text-sm font-semibold", tab === t.id ? "bg-ocean-900 text-white" : "text-ocean-700 hover:bg-ocean-100")}>
               <t.icon className="h-4 w-4" aria-hidden /><span className={tab === t.id ? "" : "hidden sm:inline"}>{t.label}</span>
             </button>

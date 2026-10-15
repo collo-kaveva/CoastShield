@@ -15,7 +15,7 @@ export interface DemoState {
 
 const iso = (minsAgo: number) => new Date(Date.now() - minsAgo * 60000).toISOString();
 
-export const DEMO_USER: User = { id: "u_demo", name: "Fatuma Said", email: "fatuma@example.com" };
+export const DEMO_USER: User = { id: "u_demo", name: "Fatuma Said", email: "fatuma@example.com", role: "OWNER" };
 export const DEMO_SLUG = "mama-fatuma-fresh-catch";
 
 export function demoState(): DemoState {

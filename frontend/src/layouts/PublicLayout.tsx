@@ -24,7 +24,7 @@ export function PublicLayout() {
             <NavLink to="/discover" className="rounded text-sm font-semibold text-ocean-700 hover:text-ocean-900">Browse businesses</NavLink>
           </nav>
           <div className="hidden items-center gap-3 lg:flex">
-            {me.data ? <Link to="/dashboard" className={buttonClass("primary", "md")}>Go to dashboard</Link> : <>
+            {me.data ? <Link to={me.data.role === "ADMIN" ? "/admin" : "/dashboard"} className={buttonClass("primary", "md")}>{me.data.role === "ADMIN" ? "Administration" : "Go to dashboard"}</Link> : <>
               <Link to="/login" className={buttonClass("ghost", "md")}>Sign in</Link>
               <Link to="/register" className={buttonClass("primary", "md")}>Get Started Free</Link>
             </>}
@@ -59,6 +59,7 @@ export function PublicLayout() {
             <li><Link className="hover:underline" to="/about">About</Link></li>
             <li><a className="hover:underline" href="/#features">Features</a></li>
             <li><a className="hover:underline" href="/#security">Security</a></li>
+            <li><Link className="hover:underline" to="/track">Track a request</Link></li>
             <li><Link className="hover:underline" to="/privacy">Privacy</Link></li>
             <li><Link className="hover:underline" to="/contact">Contact</Link></li>
           </ul></nav>

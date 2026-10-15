@@ -1,6 +1,6 @@
 import type {
-  AnalysisHistoryItem, Business, CatalogItem, ChecklistItem, DashboardSummary, IncidentGuide, MessageAnalysis, Order,
-  OrderStatus, PaymentStatus, PublicBusiness, Storefront, UrlAnalysis, User, Category, OpeningHours,
+  AnalysisHistoryItem, AuditPage, Business, CatalogItem, ChecklistItem, DashboardSummary, IncidentGuide, MessageAnalysis, Order,
+  OrderLookupResult, OrderStatus, PaymentStatus, PublicBusiness, Storefront, UrlAnalysis, User, Category, OpeningHours,
 } from "@/types";
 
 export interface BusinessInput {
@@ -57,6 +57,8 @@ export interface Api {
     get(id: string): Promise<Order>;
     transition(id: string, to: OrderStatus): Promise<Order>;
     setPayment(id: string, status: PaymentStatus): Promise<Order>;
+    /** Customer-facing: needs the reference AND the contact used. Any mismatch looks like "not found". */
+    lookup(reference: string, contact: string): Promise<OrderLookupResult>;
   };
   security: {
     analyzeMessage(text: string): Promise<MessageAnalysis>;
@@ -68,5 +70,7 @@ export interface Api {
     clearHistory(): Promise<void>;
   };
   dashboard: { summary(): Promise<DashboardSummary> };
+  /** Administrators only (enforced by the backend). Not available in demo mode. */
+  admin: { auditEvents(opts: { action?: string; page?: number }): Promise<AuditPage> };
   demo: { reset(): Promise<void> };
 }

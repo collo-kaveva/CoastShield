@@ -23,4 +23,3 @@ backend/staticfiles/
 .DS_Store
 .idea/
 .vscode/
-backend/media/

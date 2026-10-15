@@ -19,9 +19,11 @@ def hash_identifier(value: str) -> str:
 
 
 def client_ip(request):
+    """Same client-IP logic as the rate limiter (honours NUM_PROXIES), so the two always agree."""
     if request is None:
         return ""
-    return request.META.get("REMOTE_ADDR", "")
+    from rest_framework.throttling import BaseThrottle
+    return BaseThrottle().get_ident(request) or ""
 
 
 def record(action, *, actor=None, target_type="", target_id="", metadata=None, request=None):

@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from .models import AuditEvent
@@ -14,5 +15,6 @@ class AuditEventSerializer(serializers.ModelSerializer):
         model = AuditEvent
         fields = ["id", "action", "actorId", "targetType", "targetId", "metadata", "createdAt"]
 
+    @extend_schema_field(serializers.CharField(allow_null=True))
     def get_actorId(self, obj):
         return str(obj.actor_id) if obj.actor_id else None

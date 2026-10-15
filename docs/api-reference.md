@@ -4,6 +4,7 @@ Authoritative contract: this file plus the TypeScript types in `frontend/src/ser
 
 **Auth:** session cookie (`HttpOnly`, `SameSite=Lax`, `Secure` outside DEBUG). State-changing requests must send `X-CSRFToken` (read the `csrftoken` cookie; `GET /auth/csrf/` sets it).
 **Errors:** `{"error": {"code", "message", "fields": {field: message}}}`. Validation errors are HTTP 422; unauthenticated 401; wrong owner or missing 404; invalid state change 409; throttled 429. No stack traces.
+**Users** are `{id, name, email, role}` (`OWNER` or `ADMIN`). Unknown `/api/v1/` URLs and unexpected failures also return the structured JSON error.
 **Pagination:** list endpoints return `{count, next, previous, results}` (`page`, `page_size` ≤ 200). JSON is camelCase.
 
 | Method + path | Auth | Notes |

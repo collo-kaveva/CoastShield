@@ -12,8 +12,16 @@ export function RequireAuth() {
 }
 
 /** Owners without a business profile are guided to onboarding first. */
+export function RequireAdmin() {
+  const me = useMe();
+  if (me.isLoading) return <Loading />;
+  return me.data?.role === "ADMIN" ? <Outlet /> : <Navigate to="/dashboard" replace />;
+}
+
 export function RequireBusiness() {
+  const me = useMe();
   const b = useBusiness();
+  if (me.data?.role === "ADMIN") return <Navigate to="/admin" replace />; // administrators have no business of their own
   if (b.isLoading) return <Loading />;
   if (b.isError) return <ErrorState message="Could not load your business." onRetry={() => b.refetch()} />;
   if (!b.data) return <Navigate to="/onboarding" replace />;
@@ -23,5 +31,5 @@ export function RequireBusiness() {
 export function RedirectIfAuthed({ children }: { children: JSX.Element }) {
   const me = useMe();
   if (me.isLoading) return <Loading />;
-  return me.data ? <Navigate to="/dashboard" replace /> : children;
+  return me.data ? <Navigate to={me.data.role === "ADMIN" ? "/admin" : "/dashboard"} replace /> : children;
 }

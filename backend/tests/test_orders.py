@@ -167,6 +167,7 @@ def test_customer_lookup_needs_matching_contact_and_leaks_nothing(anon, store):
     wrong = anon.post("/api/v1/orders/lookup/", {"reference": ref, "contact": "0700 000 000"}, format="json")
     missing = anon.post("/api/v1/orders/lookup/", {"reference": "CS-NOPE22", "contact": "0700 123 456"}, format="json")
     assert wrong.status_code == missing.status_code == 404 and wrong.json() == missing.json()
+    assert "No matching request found" in wrong.json()["error"]["message"]  # helpful, and identical for both cases
 
 
 def test_order_lookup_is_rate_limited(anon, store, monkeypatch):

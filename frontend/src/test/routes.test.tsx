@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { Providers, makeClient } from "@/app/App";
 import { AppRoutes } from "@/routes/AppRoutes";
@@ -23,6 +23,7 @@ describe("public routes load", () => {
     ["/discover", /Browse local businesses/],
     ["/store/bandari-fresh-fish", /Bandari Fresh Fish/],
     ["/about", /About CoastShield/],
+    ["/track", /Track your request/],
     ["/privacy", /Privacy notice/],
     ["/contact", /Contact/],
     ["/nope", /Page not found/],
@@ -144,5 +145,45 @@ describe("owner flows", () => {
     fireEvent.click(await screen.findByRole("button", { name: /Continue/ }));
     expect(await screen.findByText("Enter your business name.")).toBeTruthy();
     await h1(/Tell us about your business/);
+  });
+});
+
+
+describe("customer tracking", () => {
+  const submit = () => api.orders.submit({ slug: "mama-fatuma-fresh-catch", customerName: "Track Me", customerContact: "0700 777 888", notes: "", items: [{ itemId: "i_tilapia", quantity: 1 }] });
+
+  it("shows the status only when reference AND contact match, and nothing private", async () => {
+    const { reference } = await submit();
+    renderAt(`/track?ref=${reference}`);
+    fireEvent.change(await screen.findByLabelText("Phone number or email"), { target: { value: "+254 700 777 888" } });
+    fireEvent.click(screen.getByRole("button", { name: /Check status/ }));
+    const region = await screen.findByRole("region", { name: "Request status" });
+    expect(within(region).getAllByText("New").length).toBeGreaterThan(0);
+    expect(within(region).getByText(/Fresh tilapia/)).toBeTruthy();
+    expect(region.textContent).not.toMatch(/Track Me|0700 777 888/); // no customer details echoed back
+  });
+
+  it("gives the same friendly message for a wrong contact and an unknown reference", async () => {
+    const { reference } = await submit();
+    const msg = async (ref: string, contact: string) => { await expect(api.orders.lookup(ref, contact)).rejects.toThrow(/No matching request found/); };
+    await msg(reference, "0700 000 000");
+    await msg("CS-NOPE22", "0700 777 888");
+    await msg(reference, "");
+    renderAt("/track");
+    fireEvent.change(await screen.findByLabelText("Reference"), { target: { value: reference } });
+    fireEvent.change(screen.getByLabelText("Phone number or email"), { target: { value: "0700 000 000" } });
+    fireEvent.click(screen.getByRole("button", { name: /Check status/ }));
+    expect((await screen.findByRole("alert")).textContent).toMatch(/No matching request found/);
+  });
+});
+
+describe("admin screen access", () => {
+  it("keeps non-admins out of /admin (owners are sent to their dashboard) and anonymous users to sign in", async () => {
+    renderAt("/admin"); await h1(/Sign in/);
+    cleanup(); await signIn(); renderAt("/admin"); await h1(/Habari/);
+  });
+  it("is unavailable in demo mode at the API level too", async () => {
+    await signIn();
+    await expect(api.admin.auditEvents({})).rejects.toMatchObject({ status: 403 });
   });
 });

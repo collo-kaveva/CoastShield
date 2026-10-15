@@ -2,7 +2,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
-from rest_framework import status
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
+from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
@@ -15,6 +17,7 @@ from apps.common.errors import Conflict  # noqa: F401  (re-exported for symmetry
 from .serializers import LoginSerializer, ProfileSerializer, RegisterSerializer, UserSerializer
 
 
+@extend_schema_view(get=extend_schema(responses=OpenApiTypes.OBJECT, auth=[]))
 @method_decorator(ensure_csrf_cookie, name="dispatch")
 class CsrfView(APIView):
     permission_classes = [AllowAny]
@@ -30,6 +33,7 @@ class RegisterView(APIView):
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "register"
 
+    @extend_schema(request=RegisterSerializer, responses={201: UserSerializer})
     def post(self, request):
         s = RegisterSerializer(data=request.data)
         s.is_valid(raise_exception=True)
@@ -46,6 +50,7 @@ class LoginView(APIView):
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "login"
 
+    @extend_schema(request=LoginSerializer, responses={200: UserSerializer})
     def post(self, request):
         s = LoginSerializer(data=request.data)
         s.is_valid(raise_exception=True)
@@ -64,16 +69,19 @@ class LoginView(APIView):
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(request=None, responses={204: None})
     def post(self, request):
         audit.record("LOGOUT", actor=request.user, request=request)
         logout(request)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema_view(patch=extend_schema(request=ProfileSerializer, responses=OpenApiTypes.OBJECT))
 class MeView(APIView):
     """GET returns {"user": null} when signed out so the SPA can check its session without error noise."""
     permission_classes = [AllowAny]
 
+    @extend_schema(responses=OpenApiTypes.OBJECT)  # {"user": {...} | null}
     def get(self, request):
         if not request.user.is_authenticated:
             return Response({"user": None})
@@ -98,5 +106,6 @@ class PasswordResetRequestView(APIView):
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "login"
 
+    @extend_schema(request=inline_serializer("PasswordResetRequest", {"email": serializers.EmailField()}), responses={204: None})
     def post(self, request):
         return Response(status=status.HTTP_204_NO_CONTENT)

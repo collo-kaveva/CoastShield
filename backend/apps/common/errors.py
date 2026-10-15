@@ -72,7 +72,7 @@ def exception_handler(exc, context):
     elif isinstance(exc, exceptions.PermissionDenied):
         message = "You do not have permission to do that."
     elif isinstance(exc, exceptions.NotFound):
-        message = "Not found."
+        message = str(exc.detail)  # keep deliberate, user-facing messages (e.g. order lookup); default is "Not found."
     else:
         d = exc.detail if hasattr(exc, "detail") else "Request failed."
         message = str(d)

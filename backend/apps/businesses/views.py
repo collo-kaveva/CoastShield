@@ -1,5 +1,7 @@
 from django.db.models import Q
 from django.conf import settings
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view, inline_serializer
 from rest_framework import serializers, status
 from rest_framework.parsers import MultiPartParser
 from rest_framework.throttling import ScopedRateThrottle
@@ -20,9 +22,11 @@ from .uploads import InvalidImage, process_logo
 from .services import missing_for_publish, own_business, public_business, public_item, unique_slug
 
 
+@extend_schema_view(put=extend_schema(request=BusinessSerializer, responses=BusinessSerializer))
 class MyBusinessView(APIView):
     """The signed-in owner's own business only. There is no business ID in the URL to tamper with."""
 
+    @extend_schema(responses=BusinessSerializer)
     def get(self, request):
         b = own_business(request.user)
         if not b:
@@ -43,6 +47,7 @@ class MyBusinessView(APIView):
 class PublishView(APIView):
     publish = True
 
+    @extend_schema(request=None, responses=BusinessSerializer)
     def post(self, request):
         b = own_business(request.user)
         if not b:
@@ -64,6 +69,8 @@ class StorefrontListView(ListAPIView):
     permission_classes = [AllowAny]
     authentication_classes: list = []
 
+    serializer_class = BusinessSerializer
+
     def get_queryset(self):
         qs = BusinessProfile.objects.filter(status=BusinessProfile.Status.PUBLISHED).order_by("-is_sample", "name")
         cat = self.request.query_params.get("category")
@@ -74,6 +81,7 @@ class StorefrontListView(ListAPIView):
             qs = qs.filter(Q(name__icontains=q) | Q(town__icontains=q) | Q(county__icontains=q) | Q(description__icontains=q))
         return qs
 
+    @extend_schema(responses=OpenApiTypes.OBJECT, parameters=[OpenApiParameter("category", str), OpenApiParameter("q", str)])
     def list(self, request, *args, **kwargs):
         page = self.paginate_queryset(self.get_queryset())
         return self.get_paginated_response([public_business(b) for b in page])
@@ -82,6 +90,7 @@ class StorefrontListView(ListAPIView):
 class StorefrontDetailView(APIView):
     permission_classes = [AllowAny]
 
+    @extend_schema(responses=OpenApiTypes.OBJECT, parameters=[OpenApiParameter("preview", str, description="1 = owner previews their own draft")])
     def get(self, request, slug):
         b = BusinessProfile.objects.filter(slug=slug).first()
         is_owner = bool(b and request.user.is_authenticated and b.owner_id == request.user.id)
@@ -97,12 +106,14 @@ class StorefrontDetailView(APIView):
         })
 
 
+@extend_schema_view(delete=extend_schema(request=None, responses=BusinessSerializer))
 class LogoView(APIView):
     """Owner's own logo only. POST multipart field "logo"; DELETE removes it."""
     parser_classes = [MultiPartParser]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "upload"
 
+    @extend_schema(request={"multipart/form-data": inline_serializer("LogoUpload", {"logo": serializers.ImageField()})}, responses=BusinessSerializer)
     def post(self, request):
         b = own_business(request.user)
         if not b:

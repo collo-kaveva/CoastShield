@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -23,6 +25,7 @@ def completion(b):
 class DashboardSummary(APIView):
     """Every number is computed from the database at request time. Nothing is invented."""
 
+    @extend_schema(responses=OpenApiTypes.OBJECT)
     def get(self, request):
         b = own_business(request.user)
         orders = list(own_orders(request.user)) if b else []

@@ -7,6 +7,8 @@ HOURS = lambda o, c: [{"day": d, "open": o, "close": c, "closed": d == "Sunday"}
 DEMO_EMAIL = "fatuma@example.com"
 DEMO_PASSWORD = "demo-password"  # development/demo only. Never use for a real account.
 DEMO_NAME = "Fatuma Said"
+DEMO_ADMIN_EMAIL = "admin@example.com"
+DEMO_ADMIN_PASSWORD = "demo-admin-password"  # development/demo only
 
 DEMO_BUSINESS = dict(
     name="Mama Fatuma's Fresh Catch", slug="mama-fatuma-fresh-catch", category="FISH_SEAFOOD",

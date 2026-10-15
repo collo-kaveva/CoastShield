@@ -50,9 +50,28 @@ Backend-enforced authorization; server-side validation; data minimization; no pa
 - The shared corpus guarantees parity on 59 cases, not on all possible inputs.
 
 ## Known limitations and remaining risks (Phase 2)
-- **Throttling uses Django's in-process cache.** With several server processes limits are per-process; production needs a shared cache (Redis/DB). IP detection uses `REMOTE_ADDR`, which behind a reverse proxy would be the proxy's address unless configured.
+- (Fixed in Phase 4) Throttle state now lives in a shared database cache, so limits hold across server processes; client IPs honour `NUM_PROXIES` (default 0: `X-Forwarded-For` is ignored so it cannot be spoofed).
 - **No email delivery:** password reset does nothing yet; there is no email verification.
 - **No account lockout** beyond the IP-based throttle.
-- **No frontend admin screen:** admins use the read-only Django admin or the `/audit/events/` API. The spec's "restricted administrative interface" is only partly met.
-- **Production flags** (HTTPS redirect, HSTS, secure cookies) are configured but only active when `DJANGO_DEBUG=False`; this was checked with `check --deploy` warnings only in DEBUG mode and not tested behind real TLS.
+- (Fixed in Phase 4) A restricted admin screen exists: audit events only, ADMIN role enforced by the backend.
+- (Verified in Phase 4) Production flags are tested by running the real settings with `DEBUG=False`; they have still not been exercised behind real TLS.
 - Dependencies are range-pinned, not locked, and have not been audited for vulnerabilities.
+
+
+## Added in Phase 4 (verified)
+- **Production configuration is tested, not assumed:** `check --deploy` has zero warnings; secure/HttpOnly/SameSite cookies, HTTPS redirect, HSTS (preload is an explicit opt-in), nosniff and frame denial are asserted from the real settings; Django does not serve uploaded media in production; the app **refuses to start** without a secret key or with a placeholder/short one in production; JSON (never HTML or stack traces) for unknown URLs, oversized bodies and unexpected errors.
+- **Shared rate limiting:** database-backed cache; a spoofed `X-Forwarded-For` cannot evade limits (tested); `NUM_PROXIES` must be set to the number of trusted proxies when deployed behind one.
+- **Known-password accounts cannot reach production:** `seed_demo` refuses unless `DEBUG` is on or an explicit flag is given; `--wipe-owners` (deletes real accounts) is development-only with no override; demo credentials are absent from the production bundle unless the sample-login flag is set.
+- **Dependencies audited and upgraded** (Pillow 12.3, pytest 9.1, React Router 7, vite 8/vitest 5); see `docs/testing-plan.md`.
+- **Admin screen:** audit events only; backend-enforced ADMIN role; no access to orders, customers, catalogs or message text (tested in the browser).
+- **Customer tracking:** needs reference *and* contact; mismatches are indistinguishable from unknown references; rate limited; returns status and item names only.
+
+## Remaining risks and honest limits (end of Phase 4)
+- **Not tested behind real TLS, a reverse proxy or a production host.** No deployment guide is provided; a production WSGI server (e.g. gunicorn), static-file serving for the Django admin, `NUM_PROXIES`, and media serving through the web server (with `nosniff`) all need to be set up by whoever deploys.
+- **Account and data lifecycle:** there is no self-service account deletion or data export, and no retention limit on order/customer contact data. Analysis history is retained 90 days; orders are not.
+- **Authentication extras are missing:** no email delivery (password reset does nothing), no email verification, no multi-factor sign-in, no lockout beyond rate limits.
+- **Detection is preliminary:** rule-based; it will miss well-written scams, voice scams and non-English text, and can flag genuine messages. Nothing verifies payments or senders.
+- **Accessibility:** automated and keyboard checks only; no screen-reader testing; English only.
+- **Browsers:** Chromium only.
+- **Build tooling:** 7 accepted Tailwind 3 build-chain advisories (never shipped).
+- Database-backed rate limiting adds a write per throttled request; use Redis if traffic grows.

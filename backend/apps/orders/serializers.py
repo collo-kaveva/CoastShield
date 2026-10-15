@@ -1,5 +1,6 @@
 import re
 
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from .models import OrderRequest
@@ -50,11 +51,13 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ["id", "reference", "businessId", "customerName", "customerContact", "notes", "items", "status", "paymentStatus",
                   "createdAt", "updatedAt", "history", "isSample"]
 
+    @extend_schema_field(serializers.ListField(child=serializers.DictField()))
     def get_items(self, o):
         return [{"itemId": str(l.item_id or f"line-{l.id}"), "name": l.name_snapshot,
                  "unitPrice": float(l.unit_price_snapshot) if l.unit_price_snapshot is not None else None, "quantity": l.quantity}
                 for l in o.lines.all()]
 
+    @extend_schema_field(serializers.ListField(child=serializers.DictField()))
     def get_history(self, o):
         return [{"at": e.created_at.isoformat(), "label": e.label} for e in o.events.all()]
 

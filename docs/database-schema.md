@@ -16,6 +16,8 @@ All primary keys are UUIDs (not guessable), except small helper tables. Migratio
 | `cybersecurity_securityanalysis` | history of checks: `kind`, `risk`, `indicators` (rule id/label/severity only), keyed HMAC `content_hash`, timestamp. **The checked text and matched snippets are never stored.** Index (user, -created_at). Capped at 100 per user; pruned after `ANALYSIS_RETENTION_DAYS` on every write and by `purge_analyses`. |
 | `audit_auditevent` | append-only; actor SET_NULL; metadata scrubbed of sensitive keys; IP stored only as a keyed hash. |
 
+| `coastshield_cache` | Django database cache (`createcachetable`): shared rate-limit counters. Disposable. |
+
 ## Changes from the earlier plan
 - One business per owner (OneToOne) for the MVP.
 - Added `OrderEvent` for history; added `is_sample` and nullable owner for sample storefronts.

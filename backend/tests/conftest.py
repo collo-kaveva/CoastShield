@@ -1,4 +1,5 @@
 import pytest
+from django.core.management import call_command
 from django.core.cache import cache
 from rest_framework.test import APIClient
 
@@ -11,8 +12,15 @@ HOURS = [{"day": d, "open": "08:00", "close": "17:00", "closed": d == "Sunday"} 
 PASSWORD = "S0me-Strong-Pass!"
 
 
+@pytest.fixture(scope="session")
+def django_db_setup(django_db_setup, django_db_blocker):
+    """The shared (database) cache that backs rate limiting needs its table in the test database too."""
+    with django_db_blocker.unblock():
+        call_command("createcachetable")
+
+
 @pytest.fixture(autouse=True)
-def _clear_throttle_cache():
+def _clear_throttle_cache(db):
     cache.clear()
     yield
     cache.clear()

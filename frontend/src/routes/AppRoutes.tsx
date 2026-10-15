@@ -1,10 +1,11 @@
 import { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Loading } from "@/components/common/States";
-import { RedirectIfAuthed, RequireAuth, RequireBusiness } from "./guards";
+import { RedirectIfAuthed, RequireAdmin, RequireAuth, RequireBusiness } from "./guards";
 import { PublicLayout } from "@/layouts/PublicLayout";
 import { AuthLayout } from "@/layouts/AuthLayout";
 import { OwnerLayout } from "@/layouts/OwnerLayout";
+import { AdminLayout } from "@/layouts/AdminLayout";
 import { StorefrontLayout } from "@/layouts/StorefrontLayout";
 import { FocusLayout } from "@/layouts/FocusLayout";
 const LandingPage = lazy(() => import("@/pages/LandingPage"));
@@ -23,6 +24,8 @@ const SecurityPage = lazy(() => import("@/pages/SecurityPage"));
 const ChecklistPage = lazy(() => import("@/pages/ChecklistPage"));
 const IncidentsPage = lazy(() => import("@/pages/IncidentsPage"));
 const SettingsPage = lazy(() => import("@/pages/SettingsPage"));
+const TrackPage = lazy(() => import("@/pages/TrackPage"));
+const AdminPage = lazy(() => import("@/pages/AdminPage"));
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage"));
 const AboutPage = lazy(() => import("@/pages/InfoPages").then((m) => ({ default: m.AboutPage })));
 const ContactPage = lazy(() => import("@/pages/InfoPages").then((m) => ({ default: m.ContactPage })));
@@ -35,6 +38,7 @@ export function AppRoutes() {
       <Route element={<PublicLayout />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/discover" element={<DiscoverPage />} />
+        <Route path="/track" element={<TrackPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/contact" element={<ContactPage />} />
@@ -60,6 +64,9 @@ export function AppRoutes() {
           <Route path="/security/incidents" element={<IncidentsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
+      </Route>
+      <Route element={<RequireAuth />}>
+        <Route element={<RequireAdmin />}><Route element={<AdminLayout />}><Route path="/admin" element={<AdminPage />} /></Route></Route>
       </Route>
       <Route path="*" element={<PublicLayout />}><Route path="*" element={<NotFoundPage />} /></Route>
     </Routes>

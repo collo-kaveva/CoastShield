@@ -26,3 +26,6 @@ urlpatterns = [
 # Development only. In production the web server must serve MEDIA_ROOT (files are always re-encoded PNGs with random names).
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler404 = "apps.common.views.not_found"
+handler500 = "apps.common.views.server_failure"

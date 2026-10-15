@@ -3,7 +3,7 @@ export type Category =
   | "CLOTHING_TAILORING" | "REPAIRS_MECHANICS" | "TOURISM" | "OTHER";
 export type BusinessStatus = "DRAFT" | "PUBLISHED";
 
-export interface User { id: string; name: string; email: string }
+export interface User { id: string; name: string; email: string; role: "OWNER" | "ADMIN" }
 export interface OpeningHours { day: string; open: string; close: string; closed: boolean }
 
 /** Owner's full (private) view of a business. */
@@ -49,6 +49,15 @@ export interface Order {
   items: OrderLine[]; status: OrderStatus; paymentStatus: PaymentStatus;
   createdAt: string; updatedAt: string; history: HistoryEvent[]; isSample: boolean;
 }
+
+/** What a customer may see about their own request: status and item names only, never other people's data. */
+export interface OrderLookupResult {
+  reference: string; businessName: string; status: OrderStatus; createdAt: string; updatedAt: string; items: { name: string; quantity: number }[];
+}
+export interface AuditEvent {
+  id: string; action: string; actorId: string | null; targetType: string; targetId: string; metadata: Record<string, unknown>; createdAt: string;
+}
+export interface AuditPage { count: number; page: number; hasNext: boolean; hasPrevious: boolean; results: AuditEvent[] }
 
 export type RiskLevel = "LOW" | "CAUTION" | "HIGH";
 export type Severity = "low" | "medium" | "high";

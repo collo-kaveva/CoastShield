@@ -133,7 +133,7 @@ export const mockApi: Api = {
       if (getState().users.some((u) => u.email === e)) f.email = "An account with this email already exists in this demo.";
       if (Object.keys(f).length) throw new ApiError("Please fix the highlighted fields.", 422, f);
       return mutate((st) => {
-        const user: User = { id: uid("u"), name: name.trim(), email: e };
+        const user: User = { id: uid("u"), name: name.trim(), email: e, role: "OWNER" };
         st.users.push(user); st.sessionUserId = user.id; // password is deliberately never stored in demo mode
         return user;
       });
@@ -286,6 +286,15 @@ export const mockApi: Api = {
         return o;
       });
     },
+    async lookup(reference, contact) {
+      await wait();
+      const norm = (v: string) => { const t = v.trim().toLowerCase(); return t.includes("@") ? t : t.replace(/\D/g, "").slice(-9); };
+      const o = getState().orders.find((x) => x.reference === reference.trim().toUpperCase());
+      if (!o || !norm(contact) || norm(o.customerContact) !== norm(contact)) throw new ApiError("No matching request found. Check the reference and the phone number or email you used.", 404);
+      const biz = getState().businesses.find((b) => b.id === o.businessId);
+      const name = biz?.name ?? SAMPLE_BUSINESSES.find((s) => s.business.id === o.businessId)?.business.name ?? "the business";
+      return { reference: o.reference, businessName: name, status: o.status, createdAt: o.createdAt, updatedAt: o.updatedAt, items: o.items.map((l) => ({ name: l.name, quantity: l.quantity })) };
+    },
     async setPayment(id, status) {
       await wait();
       return mutate((s) => {
@@ -327,6 +336,8 @@ export const mockApi: Api = {
     },
     async clearHistory() { await wait(); mutate((s) => { const u = requireUser(s); s.analyses = (s.analyses ?? []).filter((a) => a.userId !== u.id); }); },
   },
+
+  admin: { async auditEvents() { throw new ApiError("The administration screen needs the real backend.", 403); } },
 
   dashboard: {
     async summary() {

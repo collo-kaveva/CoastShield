@@ -11,9 +11,9 @@ src/
   assets/     (none yet: icons come from Lucide, logo is inline SVG)
   components/ common (Button, Fields, Modal, States, QrCard), storefront, orders, security, landing
   hooks/      TanStack Query hooks; pages only use these, never the mock
-  layouts/    Public, Auth, Owner (sidebar + mobile tab bar), Storefront (customer-facing), Focus (onboarding)
+  layouts/    Public, Auth, Owner (sidebar + mobile tab bar), Storefront (customer-facing), Focus (onboarding), Admin
   lib/        pure helpers: order transition table, categories, public/private projection, schemas
-  pages/      one file per route (lazy-loaded)
+  pages/      one file per route (lazy-loaded), incl. TrackPage (customer lookup) and AdminPage (audit events, ADMIN only)
   routes/     AppRoutes, guards (RequireAuth, RequireBusiness)
   services/   types.ts = the Api contract; mock/ = demo implementation; http/ = Django client; security/ = rule engine + content
   types/      domain types shared by UI and services

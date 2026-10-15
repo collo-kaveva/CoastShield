@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CheckCircle2, Copy } from "lucide-react";
+import { Link } from "react-router-dom";
 import type { PublicBusiness, PublicItem } from "@/types";
 import { Modal } from "@/components/common/Modal";
 import { Button } from "@/components/common/Button";
@@ -55,6 +56,7 @@ export function OrderRequestDialog({ open, onClose, business, items, cart, onDon
           <p className="mt-3 text-ocean-700">{business.name} has your request. Keep this reference to ask about it later:</p>
           <p className="my-4 rounded-xl bg-sand-100 py-3 font-mono text-2xl font-bold tracking-widest" data-testid="order-reference">{receipt}</p>
           <Button variant="secondary" size="sm" onClick={() => copy(receipt, "Reference")}><Copy className="h-4 w-4" />Copy reference</Button>
+          <p className="mt-3 text-sm"><Link to={`/track?ref=${receipt}`} className="font-semibold text-lagoon-800 underline">Check the progress of this request later</Link></p>
           <p className="mt-4 text-sm text-ocean-600">This is not a payment and not yet a confirmed order. The business will contact you to agree details.{business.isSample && " This is a sample business, so nobody will actually reply."}</p>
         </div>
       ) : (

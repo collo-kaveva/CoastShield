@@ -1,6 +1,7 @@
 from datetime import timedelta
 
-from django.core.management.base import BaseCommand
+from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils import timezone
 
@@ -19,13 +20,23 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--reset", action="store_true", help="Delete all sample data (and the demo account) before loading.")
+        parser.add_argument("--with-admin", action="store_true", help="Also create a demo ADMIN account so the admin screen can be shown (development only).")
+        parser.add_argument("--allow-known-passwords", action="store_true", help="Required when DEBUG is off: acknowledges these accounts have publicly known passwords.")
+        parser.add_argument("--wipe-owners", action="store_true", help="Development only: also delete every other business-owner account (and their data), e.g. after a rehearsal.")
         parser.add_argument("--remove-only", action="store_true", help="Delete sample data and exit.")
 
     @transaction.atomic
     def handle(self, *args, **opts):
+        if not (opts["remove_only"] or settings.DEBUG or opts["allow_known_passwords"]):
+            raise CommandError("Refusing to create accounts with publicly known passwords while DEBUG is off. Use --allow-known-passwords only for a throwaway demo.")
+        if opts["wipe_owners"]:
+            if not settings.DEBUG:
+                raise CommandError("--wipe-owners deletes real accounts and is only allowed when DEBUG is on (development).")
+            n, _ = User.objects.filter(role="OWNER").delete()
+            self.stdout.write(f"Deleted all owner accounts and their data ({n} rows).")
         if opts["reset"] or opts["remove_only"]:
             BusinessProfile.objects.filter(is_sample=True).delete()  # cascades items and orders
-            User.objects.filter(email=d.DEMO_EMAIL).delete()
+            User.objects.filter(email__in=[d.DEMO_EMAIL, d.DEMO_ADMIN_EMAIL]).delete()
             self.stdout.write("Removed existing sample data.")
             if opts["remove_only"]:
                 return
@@ -58,4 +69,7 @@ class Command(BaseCommand):
                 OrderEvent.objects.filter(pk=ev.pk).update(created_at=now - timedelta(minutes=max(mins - i * 20, 1)))
         for key in d.DEMO_CHECKLIST:
             UserChecklistProgress.objects.create(user=user, item=SecurityChecklistItem.objects.get(key=key))
+        if opts["with_admin"]:
+            User.objects.create_user(email=d.DEMO_ADMIN_EMAIL, password=d.DEMO_ADMIN_PASSWORD, name="Demo Admin", role="ADMIN")
+            self.stdout.write(f"Demo admin: {d.DEMO_ADMIN_EMAIL} / {d.DEMO_ADMIN_PASSWORD} (SAMPLE ONLY, development only).")
         self.stdout.write(self.style.SUCCESS(f"Loaded {len(d.SAMPLES) + 1} sample businesses. Demo login: {d.DEMO_EMAIL} / {d.DEMO_PASSWORD} (SAMPLE ONLY)."))

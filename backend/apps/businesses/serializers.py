@@ -1,5 +1,6 @@
 import re
 
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from .models import BusinessProfile
@@ -41,9 +42,11 @@ class BusinessSerializer(serializers.ModelSerializer):
                   "email", "showPhone", "showEmail", "hours", "showPrices", "slug", "status", "logoUrl", "isSample", "createdAt", "updatedAt"]
         read_only_fields = ["slug", "status"]
 
+    @extend_schema_field(serializers.CharField(allow_null=True))
     def get_logoUrl(self, obj):
         return obj.logo.url if obj.logo else None
 
+    @extend_schema_field(serializers.CharField(allow_null=True))
     def get_ownerId(self, obj):
         return str(obj.owner_id) if obj.owner_id else None
 

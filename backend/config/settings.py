@@ -2,6 +2,7 @@
 from pathlib import Path
 
 import environ
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,6 +21,7 @@ env = environ.Env(
     RATE_LIMIT_ANALYSIS=(str, "20/min"),
     RATE_LIMIT_UPLOAD=(str, "20/hour"),
     ANALYSIS_RETENTION_DAYS=(int, 90),
+    NUM_PROXIES=(int, 0),
 )
 # Optional local .env at the repository root (never committed).
 environ.Env.read_env(BASE_DIR.parent / ".env")
@@ -27,6 +29,11 @@ environ.Env.read_env(BASE_DIR.parent / ".env")
 DEBUG = env("DJANGO_DEBUG")
 # No default: the app refuses to start without a secret key.
 SECRET_KEY = env("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set (see .env.example).")
+if not DEBUG and (len(SECRET_KEY) < 50 or SECRET_KEY.startswith(("change-me", "dev-only", "django-insecure"))):
+    # Fail fast instead of running production with a placeholder or guessable key.
+    raise ImproperlyConfigured("DJANGO_SECRET_KEY is a placeholder or too short for production (need 50+ random characters).")
 ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS")
 CSRF_TRUSTED_ORIGINS = env("DJANGO_CSRF_TRUSTED_ORIGINS")
 
@@ -103,6 +110,10 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# ---- Cache: shared by all server processes so rate limits hold with several workers (no Redis needed).
+# Create the table once with:  python manage.py createcachetable
+CACHES = {"default": {"BACKEND": "django.core.cache.backends.db.DatabaseCache", "LOCATION": "coastshield_cache"}}
+
 # ---- Sessions, CSRF, CORS ----
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
@@ -118,7 +129,10 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    # Preloading is effectively irreversible for a domain, so it is an explicit opt-in.
+    SECURE_HSTS_PRELOAD = env.bool("DJANGO_HSTS_PRELOAD", default=False)
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SILENCED_SYSTEM_CHECKS = [] if env.bool("DJANGO_HSTS_PRELOAD", default=False) else ["security.W021"]  # preload is a deliberate opt-in
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
 X_FRAME_OPTIONS = "DENY"
@@ -143,6 +157,9 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 50,
     "EXCEPTION_HANDLER": "apps.common.errors.exception_handler",
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    # Number of trusted reverse proxies in front of Django. 0 = use the socket address (safe default; X-Forwarded-For is ignored,
+    # so clients cannot spoof their IP to dodge rate limits). Set to 1 behind a single proxy such as nginx.
+    "NUM_PROXIES": env("NUM_PROXIES"),
     "DEFAULT_THROTTLE_RATES": {
         "login": env("RATE_LIMIT_LOGIN"),
         "register": env("RATE_LIMIT_REGISTER"),
