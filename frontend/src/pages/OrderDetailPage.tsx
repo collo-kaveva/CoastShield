@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { Banknote, Mail, Phone } from "lucide-react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Banknote, Mail, Phone, Wallet } from "lucide-react";
 import { useOrder, useSetPayment, useTransition } from "@/hooks/queries";
 import { Badge, Breadcrumbs, ErrorState, Loading } from "@/components/common/States";
 import { Button, buttonClass } from "@/components/common/Button";
 import { StatusBadge, StatusStepper } from "@/components/orders/StatusBadge";
 import { ConfirmDialog } from "@/components/common/Modal";
+import { PaymentDialog } from "@/components/orders/PaymentDialog";
 import { useToast } from "@/app/ToastProvider";
 import { STATUS_ACTION, STATUS_LABEL, TRANSITIONS, orderTotal } from "@/lib/orderRules";
 import { errorMessage, formatDateTime, formatKes } from "@/lib/utils";
@@ -13,12 +14,23 @@ import type { OrderStatus } from "@/types";
 
 export default function OrderDetailPage() {
   const { id = "" } = useParams();
+  const [searchParams] = useSearchParams();
   const q = useOrder(id);
   const move = useTransition();
   const pay = useSetPayment();
   const { toast } = useToast();
   const [cancel, setCancel] = useState(false);
   const [payConfirm, setPayConfirm] = useState(false);
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+
+  // Handle payment callback from Paystack
+  const paymentSuccess = searchParams.get("payment") === "success";
+  if (paymentSuccess) {
+    // Verify payment and refresh order
+    // This will be handled by the payment verification logic
+    // For now, just remove the param
+    window.history.replaceState({}, "", window.location.pathname);
+  }
 
   if (q.isLoading) return <Loading />;
   if (q.isError || !q.data) return (
@@ -35,6 +47,11 @@ export default function OrderDetailPage() {
   };
   const setPaid = async () => {
     try { await pay.mutateAsync({ id: o.id, status: o.paymentStatus === "PAID" ? "UNPAID" : "PAID" }); toast("Payment status recorded."); setPayConfirm(false); } catch (e) { toast(errorMessage(e), "error"); }
+  };
+
+  const handlePaymentSuccess = (paymentReference: string) => {
+    toast(`Payment initialized with reference: ${paymentReference}`);
+    q.refetch();
   };
 
   return (
@@ -79,7 +96,17 @@ export default function OrderDetailPage() {
             <h2 className="flex items-center gap-2 text-lg font-bold"><Banknote className="h-5 w-5 text-lagoon-700" aria-hidden />Payment</h2>
             <p className="mt-2"><Badge tone={o.paymentStatus === "PAID" ? "green" : "neutral"}>{o.paymentStatus === "PAID" ? "Recorded as paid" : "Not recorded as paid"}</Badge></p>
             <p className="mt-3 text-sm text-ocean-700">You record this yourself after checking <strong>your own</strong> M-PESA, bank or cash. CoastShield cannot verify payments, and a customer's message or screenshot is never proof.</p>
-            {o.status !== "CANCELLED" && <Button className="mt-3" variant="secondary" onClick={() => setPayConfirm(true)}>{o.paymentStatus === "PAID" ? "Mark as not paid" : "Record as paid"}</Button>}
+            {o.status !== "CANCELLED" && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button variant="secondary" onClick={() => setPayConfirm(true)}>{o.paymentStatus === "PAID" ? "Mark as not paid" : "Record as paid"}</Button>
+                {o.paymentStatus !== "PAID" && (
+                  <Button variant="primary" onClick={() => setPaymentDialogOpen(true)}>
+                    <Wallet className="h-4 w-4 mr-2" aria-hidden />
+                    Initialize Payment
+                  </Button>
+                )}
+              </div>
+            )}
           </section>
           <section className="card p-5" aria-label="History">
             <h2 className="text-lg font-bold">History</h2>
@@ -93,6 +120,14 @@ export default function OrderDetailPage() {
       <ConfirmDialog open={cancel} onClose={() => setCancel(false)} onConfirm={() => go("CANCELLED")} loading={move.isPending} danger title="Cancel this request?" confirmLabel="Cancel request" message="A cancelled request cannot be reopened. Let the customer know if you can." />
       <ConfirmDialog open={payConfirm} onClose={() => setPayConfirm(false)} onConfirm={setPaid} loading={pay.isPending} title={o.paymentStatus === "PAID" ? "Mark as not paid?" : "Record as paid?"} confirmLabel={o.paymentStatus === "PAID" ? "Mark as not paid" : "Yes, I checked my account"}
         message={o.paymentStatus === "PAID" ? "This only changes your own record." : "Only continue if you have confirmed the money in your own account or received cash. This is a manual note, not a verified payment."} />
+      <PaymentDialog
+        open={paymentDialogOpen}
+        onClose={() => setPaymentDialogOpen(false)}
+        orderId={o.id}
+        orderReference={o.reference}
+        amount={total}
+        onSuccess={handlePaymentSuccess}
+      />
     </div>
   );
 }

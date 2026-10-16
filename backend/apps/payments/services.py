@@ -3,7 +3,7 @@ import uuid
 from decimal import Decimal
 from typing import Optional
 
-import paystack
+import paystackapi
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone

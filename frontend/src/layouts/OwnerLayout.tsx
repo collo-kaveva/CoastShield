@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { ClipboardList, ExternalLink, LayoutDashboard, LogOut, Package, Settings, ShieldCheck, Store } from "lucide-react";
+import { ClipboardList, ExternalLink, LayoutDashboard, LogOut, Package, Settings, ShieldCheck, Store, Wallet } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { useAuthActions, useBusiness, useMe, useOrders } from "@/hooks/queries";
@@ -25,10 +25,11 @@ export function OwnerLayout() {
     { to: "/business", label: "My storefront", icon: Store },
     { to: "/business/catalog", label: "Catalog", icon: Package },
     { to: "/orders", label: "Orders", icon: ClipboardList, badge: newCount },
+    { to: "/payments", label: "Payments", icon: Wallet },
     { to: "/security", label: "Security centre", icon: ShieldCheck },
     { to: "/settings", label: "Settings", icon: Settings },
   ];
-  const mobile = [links[0], links[2], links[3], links[4], links[5]];
+  const mobile = [links[0], links[2], links[3], links[4], links[5], links[6]];
 
   const doLogout = async () => { await logout.mutateAsync(); toast("You have signed out."); nav("/"); };
 

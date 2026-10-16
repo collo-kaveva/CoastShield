@@ -2,7 +2,7 @@
 import type { Api } from "../types";
 import { ApiError } from "../errors";
 import { fetchAll, request } from "./client";
-import type { AnalysisHistoryItem, AuditEvent, OrderLookupResult, Business, IncidentGuide, MessageAnalysis, UrlAnalysis, CatalogItem, ChecklistItem, DashboardSummary, Order, PublicBusiness, Storefront, User } from "@/types";
+import type { AnalysisHistoryItem, AuditEvent, OrderLookupResult, Business, IncidentGuide, MessageAnalysis, UrlAnalysis, CatalogItem, ChecklistItem, DashboardSummary, Order, PublicBusiness, Storefront, User, Payment, Transaction, Refund } from "@/types";
 
 export const httpApi: Api = {
   auth: {
@@ -58,6 +58,14 @@ export const httpApi: Api = {
     clearHistory: async () => { await request<void>("DELETE", "/security/analyses/"); },
   },
   dashboard: { summary: () => request<DashboardSummary>("GET", "/dashboard/summary/") },
+  payments: {
+    initialize: (input) => request("POST", "/payments/initialize/", input),
+    verify: (reference) => request("POST", "/payments/verify/", { reference }),
+    get: (reference) => request<Payment>("GET", `/payments/${reference}/`),
+    list: () => fetchAll<Payment>("/payments/list/"),
+    listTransactions: (paymentReference) => fetchAll<Transaction>(`/payments/${paymentReference}/transactions/`),
+    refund: (input) => request<Refund>("POST", "/payments/refund/", input),
+  },
   admin: {
     auditEvents: async ({ action, page = 1 }) => {
       const p = new URLSearchParams({ page: String(page), page_size: "25" });

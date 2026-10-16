@@ -24,6 +24,8 @@ const SecurityPage = lazy(() => import("@/pages/SecurityPage"));
 const ChecklistPage = lazy(() => import("@/pages/ChecklistPage"));
 const IncidentsPage = lazy(() => import("@/pages/IncidentsPage"));
 const SettingsPage = lazy(() => import("@/pages/SettingsPage"));
+const PaymentsPage = lazy(() => import("@/pages/PaymentsPage"));
+const PaymentCallbackPage = lazy(() => import("@/pages/PaymentCallbackPage"));
 const TrackPage = lazy(() => import("@/pages/TrackPage"));
 const AdminPage = lazy(() => import("@/pages/AdminPage"));
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage"));
@@ -58,6 +60,8 @@ export function AppRoutes() {
             <Route path="/business/catalog" element={<CatalogPage />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/orders/:id" element={<OrderDetailPage />} />
+            <Route path="/payments" element={<PaymentsPage />} />
+            <Route path="/payment/callback" element={<PaymentCallbackPage />} />
           </Route>
           <Route path="/security" element={<SecurityPage />} />
           <Route path="/security/checklist" element={<ChecklistPage />} />

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/services";
-import type { BusinessInput, CatalogInput, OrderInput, PaymentMethod } from "@/services/types";
-import type { Category, OrderStatus, PaymentStatus } from "@/types";
+import type { BusinessInput, CatalogInput, OrderInput } from "@/services/types";
+import type { Category, OrderStatus, PaymentStatus, PaymentMethod } from "@/types";
 
 /** Every mutation refreshes all cached data except the session: simple and always consistent in the MVP. */
 function useRefreshing<TIn, TOut>(fn: (v: TIn) => Promise<TOut>) {
