@@ -2,12 +2,13 @@ from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers as drf_serializers, status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListAPIView, RetrieveAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from apps.businesses.models import BusinessProfile
+from apps.accounts.permissions import BusinessObjectPermission
 
 from . import services
 from .models import OrderRequest
@@ -55,15 +56,18 @@ class LookupOrderView(APIView):
         })
 
 
-class OrderList(ListAPIView):
+class OrderListView(ListAPIView):
     serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return own_orders(self.request.user)
 
 
-class OrderDetail(RetrieveAPIView):
+class OrderDetailView(RetrieveAPIView):
     serializer_class = OrderSerializer
+    lookup_field = "id"
+    permission_classes = [IsAuthenticated, BusinessObjectPermission]
 
     def get_queryset(self):
         return own_orders(self.request.user)

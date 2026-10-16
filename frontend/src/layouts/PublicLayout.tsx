@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
 import { buttonClass } from "@/components/common/Button";
+import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { useMe } from "@/hooks/queries";
 
 const NAV = [
@@ -24,6 +25,7 @@ export function PublicLayout() {
             <NavLink to="/discover" className="rounded text-sm font-semibold text-ocean-700 hover:text-ocean-900">Browse businesses</NavLink>
           </nav>
           <div className="hidden items-center gap-3 lg:flex">
+            <LanguageSwitcher />
             {me.data ? <Link to={me.data.role === "ADMIN" ? "/admin" : "/dashboard"} className={buttonClass("primary", "md")}>{me.data.role === "ADMIN" ? "Administration" : "Go to dashboard"}</Link> : <>
               <Link to="/login" className={buttonClass("ghost", "md")}>Sign in</Link>
               <Link to="/register" className={buttonClass("primary", "md")}>Get Started Free</Link>
@@ -40,6 +42,7 @@ export function PublicLayout() {
               <li><Link to="/discover" onClick={() => setOpen(false)} className="block rounded-lg px-3 py-3 font-semibold text-ocean-800 hover:bg-ocean-50">Browse businesses</Link></li>
             </ul>
             <div className="mt-3 grid gap-2">
+              <LanguageSwitcher />
               {me.data ? <Link to="/dashboard" className={buttonClass("primary", "lg")}>Go to dashboard</Link> : <>
                 <Link to="/register" className={buttonClass("primary", "lg")}>Get Started Free</Link>
                 <Link to="/login" className={buttonClass("secondary", "lg")}>Sign in</Link>

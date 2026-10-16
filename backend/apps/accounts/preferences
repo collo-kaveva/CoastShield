@@ -1,0 +1,36 @@
+import uuid
+
+from django.db import models
+
+
+class NotificationPreference(models.Model):
+    """User notification preferences for different channels and event types."""
+    
+    class Channel(models.TextChoices):
+        EMAIL = "EMAIL", "Email"
+        SMS = "SMS", "SMS"
+        WHATSAPP = "WHATSAPP", "WhatsApp"
+    
+    class EventType(models.TextChoices):
+        ORDER_NEW = "ORDER_NEW", "New order received"
+        ORDER_UPDATE = "ORDER_UPDATE", "Order status updated"
+        PAYMENT_RECEIVED = "PAYMENT_RECEIVED", "Payment received"
+        STAFF_INVITATION = "STAFF_INVITATION", "Staff invitation"
+        SECURITY_ALERT = "SECURITY_ALERT", "Security alert"
+        MARKETING = "MARKETING", "Marketing updates"
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField("accounts.User", on_delete=models.CASCADE, related_name="notification_preferences")
+    channel = models.CharField(max_length=10, choices=Channel.choices, default=Channel.EMAIL)
+    event_types = models.JSONField(default=list, help_text="List of event types the user wants to receive")
+    enabled = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=["user"]),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.email} - {self.channel}"

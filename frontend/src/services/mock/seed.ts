@@ -1,5 +1,5 @@
 /** SAMPLE DATA ONLY. Every record here is fictional and flagged isSample. */
-import type { Business, CatalogItem, Category, Order, PublicBusiness, PublicItem, User } from "@/types";
+import type { Business, CatalogItem, Category, Order, PublicBusiness, PublicItem, User, Payment, Transaction, Refund } from "@/types";
 import { defaultHours } from "@/lib/hours";
 
 export interface DemoState {
@@ -8,6 +8,9 @@ export interface DemoState {
   businesses: Business[];
   items: CatalogItem[];
   orders: Order[];
+  payments?: Payment[];
+  transactions?: Transaction[];
+  refunds?: Refund[];
   checklist: Record<string, string[]>;
   /** Past checks: outcome only, never the checked text. */
   analyses?: { id: string; userId: string; kind: "MESSAGE" | "URL"; risk: "LOW" | "CAUTION" | "HIGH"; indicators: { id: string; label: string; severity: "low" | "medium" | "high" }[]; createdAt: string }[];

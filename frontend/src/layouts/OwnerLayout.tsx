@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { ClipboardList, ExternalLink, LayoutDashboard, LogOut, Package, Settings, ShieldCheck, Store } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
+import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { useAuthActions, useBusiness, useMe, useOrders } from "@/hooks/queries";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/app/ToastProvider";
@@ -48,8 +49,11 @@ export function OwnerLayout() {
             ))}
           </ul>
         </nav>
-        <p className="mb-3 text-xs text-ocean-300">Signed in as {me.data?.email}</p>
-        <button onClick={() => setConfirm(true)} className="flex min-h-[44px] items-center gap-3 rounded-xl px-3 font-semibold hover:bg-white/10"><LogOut className="h-5 w-5" aria-hidden />Sign out</button>
+        <div className="space-y-3">
+          <LanguageSwitcher />
+          <p className="text-xs text-navy-300">Signed in as {me.data?.email}</p>
+          <button onClick={() => setConfirm(true)} className="flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 font-semibold hover:bg-white/10"><LogOut className="h-5 w-5" aria-hidden />Sign out</button>
+        </div>
       </aside>
 
       <div className="flex min-w-0 flex-col pb-20 lg:pb-0">

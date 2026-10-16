@@ -37,6 +37,7 @@ class BusinessProfile(models.Model):
     slug = models.SlugField(max_length=60, unique=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.DRAFT)
     logo = models.ImageField(upload_to="logos/", blank=True)
+    paystack_subaccount_code = models.CharField(max_length=100, blank=True, help_text="Paystack subaccount code for transaction splitting")
     is_sample = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

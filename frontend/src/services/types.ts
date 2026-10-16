@@ -1,6 +1,7 @@
 import type {
   AnalysisHistoryItem, AuditPage, Business, CatalogItem, ChecklistItem, DashboardSummary, IncidentGuide, MessageAnalysis, Order,
   OrderLookupResult, OrderStatus, PaymentStatus, PublicBusiness, Storefront, UrlAnalysis, User, Category, OpeningHours,
+  RiskLevel, Severity, Indicator, AnalysisResult, StaffRole, StaffStatus, Staff, UserDataExport, PaymentMethod, Payment, Transaction, Refund
 } from "@/types";
 
 export interface BusinessInput {
@@ -31,6 +32,11 @@ export interface Api {
     logout(): Promise<void>;
     requestReset(email: string): Promise<void>;
     updateProfile(input: { name: string }): Promise<User>;
+    verifyEmail(token: string): Promise<User>;
+    resendVerification(): Promise<void>;
+    mfaSetup(): Promise<{ secret: string; qr_code: string; backup_codes: string[] }>;
+    mfaVerify(code: string): Promise<User>;
+    mfaDisable(code: string): Promise<User>;
   };
   business: {
     get(): Promise<Business | null>;
@@ -59,6 +65,36 @@ export interface Api {
     setPayment(id: string, status: PaymentStatus): Promise<Order>;
     /** Customer-facing: needs the reference AND the contact used. Any mismatch looks like "not found". */
     lookup(reference: string, contact: string): Promise<OrderLookupResult>;
+  };
+  payments: {
+    initialize(input: { orderId: string; method: PaymentMethod; email?: string; callbackUrl?: string }): Promise<{
+      paymentReference: string;
+      authorizationUrl?: string;
+      accessCode?: string;
+      reference?: string;
+      status: string;
+      message?: string;
+    }>;
+    verify(reference: string): Promise<{
+      status: string;
+      paymentReference: string;
+      orderReference: string;
+      amount: string;
+      paymentStatus: string;
+    }>;
+    get(reference: string): Promise<Payment>;
+    list(): Promise<Payment[]>;
+    listTransactions(paymentReference: string): Promise<Transaction[]>;
+    refund(input: { paymentId: string; amount: number; reason?: string }): Promise<Refund>;
+  };
+  staff: {
+    list(): Promise<Staff[]>;
+    invite(input: { email: string; role: StaffRole }): Promise<Staff>;
+    accept(token: string): Promise<Staff>;
+  };
+  account: {
+    requestDeletion(): Promise<void>;
+    exportData(): Promise<UserDataExport>;
   };
   security: {
     analyzeMessage(text: string): Promise<MessageAnalysis>;

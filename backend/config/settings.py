@@ -22,6 +22,15 @@ env = environ.Env(
     RATE_LIMIT_UPLOAD=(str, "20/hour"),
     ANALYSIS_RETENTION_DAYS=(int, 90),
     NUM_PROXIES=(int, 0),
+    PAYSTACK_SECRET_KEY=(str, ""),
+    PAYSTACK_PUBLIC_KEY=(str, ""),
+    PAYSTACK_TEST_MODE=(bool, True),
+    PAYSTACK_WEBHOOK_SECRET=(str, ""),
+    PLATFORM_COMMISSION_PERCENT=(float, 0),
+    DATA_RETENTION_DAYS=(int, 90),
+    ACCOUNT_DELETION_GRACE_DAYS=(int, 30),
+    EMAIL_FROM=(str, "noreply@coastshield.example.com"),
+    EMAIL_BACKEND=(str, "django.core.mail.backends.console.EmailBackend"),
 )
 # Optional local .env at the repository root (never committed).
 environ.Env.read_env(BASE_DIR.parent / ".env")
@@ -54,6 +63,7 @@ INSTALLED_APPS = [
     "apps.orders",
     "apps.cybersecurity",
     "apps.audit",
+    "apps.payments",
 ]
 
 MIDDLEWARE = [

@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuthActions } from "@/hooks/queries";
+import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { CheckField, PasswordField, TextField } from "@/components/common/Fields";
 import { Button } from "@/components/common/Button";
 import { useToast } from "@/app/ToastProvider";
@@ -36,8 +37,9 @@ export default function RegisterPage() {
 
   return (
     <div>
+      <div className="mb-6 flex justify-end"><LanguageSwitcher /></div>
       <h1 className="text-3xl font-bold">Create your free account</h1>
-      <p className="mt-1 text-ocean-600">It takes about two minutes to get your storefront ready.</p>
+      <p className="mt-1 text-navy-600">It takes about two minutes to get your storefront ready.</p>
       <form onSubmit={submit} noValidate className="mt-6 space-y-4">
         {error && <p role="alert" className="rounded-xl bg-coral-50 px-4 py-3 text-sm font-medium text-coral-700">{error}</p>}
         <TextField label="Your name" autoComplete="name" error={errors.name?.message} {...register("name")} />
@@ -49,8 +51,8 @@ export default function RegisterPage() {
         </div>
         <Button type="submit" size="lg" className="w-full" loading={signUp.isPending}>Create account</Button>
       </form>
-      <p className="mt-4 text-center text-sm text-ocean-600"><Link to="/privacy" className="underline">Read the privacy notice</Link></p>
-      <p className="mt-4 text-center text-ocean-700">Already have an account? <Link to="/login" className="font-semibold text-lagoon-800 underline">Sign in</Link></p>
+      <p className="mt-4 text-center text-sm text-navy-600"><Link to="/privacy" className="underline">Read the privacy notice</Link></p>
+      <p className="mt-4 text-center text-navy-700">Already have an account? <Link to="/login" className="font-semibold text-teal-800 underline">Sign in</Link></p>
     </div>
   );
 }

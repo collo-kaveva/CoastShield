@@ -3,7 +3,14 @@ export type Category =
   | "CLOTHING_TAILORING" | "REPAIRS_MECHANICS" | "TOURISM" | "OTHER";
 export type BusinessStatus = "DRAFT" | "PUBLISHED";
 
-export interface User { id: string; name: string; email: string; role: "OWNER" | "ADMIN" }
+export interface User { 
+  id: string; 
+  name: string; 
+  email: string; 
+  role: "OWNER" | "ADMIN" | "STAFF"; 
+  emailVerified: boolean;
+  mfaEnabled: boolean;
+}
 export interface OpeningHours { day: string; open: string; close: string; closed: boolean }
 
 /** Owner's full (private) view of a business. */
@@ -40,14 +47,66 @@ export interface PublicItem {
 export interface Storefront { business: PublicBusiness; items: PublicItem[]; isPreview: boolean }
 
 export type OrderStatus = "NEW" | "ACCEPTED" | "READY" | "COMPLETED" | "CANCELLED";
-export type PaymentStatus = "UNPAID" | "PAID";
+export type PaymentStatus = "UNPAID" | "PENDING" | "PAID" | "FAILED";
+export type PaymentMethod = "PAYSTACK" | "CASH_ON_DELIVERY" | "MANUAL_MOBILE_MONEY";
 export interface OrderLine { itemId: string; name: string; unitPrice: number | null; quantity: number }
 export interface HistoryEvent { at: string; label: string }
 export interface Order {
   id: string; reference: string; businessId: string;
   customerName: string; customerContact: string; notes: string;
   items: OrderLine[]; status: OrderStatus; paymentStatus: PaymentStatus;
+  paymentMethod?: string;
   createdAt: string; updatedAt: string; history: HistoryEvent[]; isSample: boolean;
+}
+
+export type PaymentStatusType = "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED" | "CANCELLED" | "REFUNDED";
+export interface Payment {
+  id: string; reference: string; orderId: string;
+  method: PaymentMethod; status: PaymentStatusType;
+  amount: number; currency: string;
+  customerEmail: string; customerName: string;
+  metadata: Record<string, unknown>;
+  createdAt: string; updatedAt: string;
+}
+
+export interface Transaction {
+  id: string; paymentId: string; providerReference: string;
+  provider: string; status: "PENDING" | "SUCCESS" | "FAILED" | "REVERSED";
+  amount: number; currency: string;
+  fees: number; commission: number;
+  subaccountCode: string;
+  verified: boolean; verifiedAt: string | null;
+  createdAt: string; updatedAt: string;
+}
+
+export interface Refund {
+  id: string; reference: string; paymentId: string;
+  transactionId: string | null; providerReference: string;
+  provider: string; status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED" | "CANCELLED";
+  amount: number; currency: string; reason: string;
+  initiatedBy: string | null;
+  createdAt: string; updatedAt: string;
+}
+
+export type StaffRole = "MANAGER" | "SALES" | "INVENTORY" | "VIEWER";
+export type StaffStatus = "PENDING" | "ACTIVE" | "SUSPENDED" | "DELETED";
+export interface Staff {
+  id: string;
+  userEmail: string;
+  userName: string;
+  role: StaffRole;
+  status: StaffStatus;
+  invitedByName: string;
+  invitedAt: string;
+  acceptedAt: string | null;
+  createdAt: string;
+}
+
+export interface UserDataExport {
+  user: { id: string; email: string; name: string; role: string; dateJoined: string };
+  business: { id: string; name: string; category: string; description: string; county: string; town: string; phone: string; whatsapp: string; email: string; createdAt: string } | null;
+  staffAssignments: Array<{ id: string; business: string; role: string; status: string; invitedAt: string }>;
+  orders: any[];
 }
 
 /** What a customer may see about their own request: status and item names only, never other people's data. */
@@ -89,4 +148,9 @@ export interface DashboardSummary {
   itemCount: number; newOrders: number; outstandingOrders: number;
   recentOrders: Order[];
   checklist: { done: number; total: number };
+  analytics: {
+    totalRevenue: number;
+    thisMonthRevenue: number;
+    revenueByMonth: Array<{ month: string; revenue: number }>;
+  };
 }

@@ -7,13 +7,14 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.audit import services as audit
 from apps.catalog.models import CatalogItem
 from apps.common.errors import Conflict  # noqa: F401
+from apps.accounts.permissions import IsBusinessOwner
 from rest_framework.exceptions import ValidationError
 
 from .models import BusinessProfile
@@ -46,6 +47,7 @@ class MyBusinessView(APIView):
 
 class PublishView(APIView):
     publish = True
+    permission_classes = [IsAuthenticated, IsBusinessOwner]
 
     @extend_schema(request=None, responses=BusinessSerializer)
     def post(self, request):

@@ -3,7 +3,7 @@
  * Not secure: there is no real authentication or server. It exists so the UI is fully
  * interactive in Phase 1 and mirrors the rules the Django backend must enforce in Phase 2.
  */
-import type { Api, BusinessInput, CatalogInput, OrderInput } from "../types";
+import type { Api, BusinessInput, CatalogInput, OrderInput, PaymentMethod } from "../types";
 import { ApiError } from "../errors";
 import { getState, mutate, resetState } from "./db";
 import { SAMPLE_BUSINESSES, type DemoState } from "./seed";
@@ -13,7 +13,7 @@ import { TRANSITIONS, STATUS_LABEL } from "@/lib/orderRules";
 import { CATEGORIES } from "@/lib/categories";
 import { analyzeMessage, analyzeUrl, validateMessage } from "../security/analyzer";
 import { CHECKLIST_DEFS, INCIDENT_GUIDES } from "../security/content";
-import type { Business, CatalogItem, ChecklistItem, Order, OrderStatus, PublicItem, User } from "@/types";
+import type { Business, CatalogItem, ChecklistItem, Order, OrderStatus, Payment, Transaction, Refund, PublicItem, User } from "@/types";
 
 const wait = () => delay(import.meta.env.MODE === "test" ? 0 : 220);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -339,17 +339,206 @@ export const mockApi: Api = {
 
   admin: { async auditEvents() { throw new ApiError("The administration screen needs the real backend.", 403); } },
 
+  payments: {
+    async initialize(input) {
+      await wait();
+      const s = getState(); const u = requireUser(s); const b = requireBusiness(s, u);
+      
+      // Find order
+      const order = s.orders.find((o) => o.id === input.orderId);
+      if (!order || order.businessId !== b.id) throw new ApiError("Order not found", 404);
+      
+      // Check if payment already exists
+      if (s.payments?.find((p) => p.orderId === order.id)) throw new ApiError("Payment already exists for this order", 400);
+      
+      // Calculate amount
+      const amount = order.items.reduce((sum, line) => sum + (line.unitPrice || 0) * line.quantity, 0);
+      
+      // Create payment record
+      const payment: Payment = {
+        id: uid("pay"),
+        reference: `PAY-${uid(8).toUpperCase()}`,
+        orderId: order.id,
+        method: input.method,
+        status: input.method === "PAYSTACK" ? "PROCESSING" : "PENDING",
+        amount,
+        currency: "KES",
+        customerEmail: input.email || "",
+        customerName: u.name,
+        metadata: {},
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      
+      mutate((st) => {
+        if (!st.payments) st.payments = [];
+        st.payments.push(payment);
+      });
+      
+      if (input.method === "PAYSTACK") {
+        // Simulate Paystack hosted checkout
+        return {
+          paymentReference: payment.reference,
+          authorizationUrl: `https://checkout.paystack.com/${uid(16)}`,
+          accessCode: uid(16),
+          reference: payment.reference,
+          status: "PROCESSING",
+        };
+      } else if (input.method === "CASH_ON_DELIVERY") {
+        return {
+          paymentReference: payment.reference,
+          status: "PENDING",
+          message: "Cash on delivery payment created. Payment will be collected on delivery.",
+        };
+      } else {
+        return {
+          paymentReference: payment.reference,
+          status: "PENDING",
+          message: "Manual mobile money payment created. Business owner will verify payment manually.",
+        };
+      }
+    },
+    
+    async verify(reference) {
+      await wait();
+      const s = getState();
+      const payment = s.payments?.find((p) => p.reference === reference);
+      if (!payment) throw new ApiError("Payment not found", 404);
+      
+      // Simulate successful verification
+      mutate((st) => {
+        const p = st.payments?.find((pay) => pay.reference === reference);
+        if (p) {
+          p.status = "COMPLETED";
+          p.updatedAt = new Date().toISOString();
+        }
+        const order = st.orders.find((o) => o.id === payment.orderId);
+        if (order) {
+          order.paymentStatus = "PAID";
+          order.paymentMethod = payment.method;
+        }
+      });
+      
+      return {
+        status: "success",
+        paymentReference: payment.reference,
+        orderReference: s.orders.find((o) => o.id === payment.orderId)?.reference || "",
+        amount: payment.amount.toString(),
+        paymentStatus: "COMPLETED",
+      };
+    },
+    
+    async get(reference) {
+      await wait();
+      const s = getState();
+      const payment = s.payments?.find((p) => p.reference === reference);
+      if (!payment) throw new ApiError("Payment not found", 404);
+      return payment;
+    },
+    
+    async list() {
+      await wait();
+      const s = getState(); const u = requireUser(s); const b = requireBusiness(s, u);
+      const payments = s.payments?.filter((p) => {
+        const order = s.orders.find((o) => o.id === p.orderId);
+        return order?.businessId === b.id;
+      }).sort((a, b) => b.createdAt.localeCompare(a.createdAt)) || [];
+      return payments;
+    },
+    
+    async listTransactions(paymentReference) {
+      await wait();
+      const s = getState();
+      const payment = s.payments?.find((p) => p.reference === paymentReference);
+      if (!payment) throw new ApiError("Payment not found", 404);
+      
+      // Return mock transactions
+      const transactions: Transaction[] = (s.transactions || []).filter((t) => t.paymentId === payment.id);
+      return transactions;
+    },
+    
+    async refund(input) {
+      await wait();
+      const s = getState(); const u = requireUser(s);
+      const payment = s.payments?.find((p) => p.id === input.paymentId);
+      if (!payment) throw new ApiError("Payment not found", 404);
+      if (payment.status !== "COMPLETED") throw new ApiError("Can only refund completed payments", 400);
+      
+      const refund: Refund = {
+        id: uid("ref"),
+        reference: `REF-${uid(8).toUpperCase()}`,
+        paymentId: payment.id,
+        transactionId: null,
+        providerReference: "",
+        provider: "paystack",
+        status: "PENDING",
+        amount: input.amount,
+        currency: "KES",
+        reason: input.reason || "",
+        initiatedBy: u.id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      
+      mutate((st) => {
+        if (!st.refunds) st.refunds = [];
+        st.refunds.push(refund);
+      });
+      
+      return refund;
+    },
+  },
+
   dashboard: {
     async summary() {
       await wait();
       const s = getState(); const u = requireUser(s); const b = ownBusiness(s, u);
       const orders = b ? s.orders.filter((o) => o.businessId === b.id).sort((a, c) => c.createdAt.localeCompare(a.createdAt)) : [];
       const list = checklistFor(s, u);
+      
+      // Calculate revenue analytics
+      const paidCompletedOrders = orders.filter((o) => o.status === "COMPLETED" && o.paymentStatus === "PAID");
+      const totalRevenue = paidCompletedOrders.reduce((sum, o) => {
+        return sum + o.items.reduce((itemSum, line) => itemSum + (line.unitPrice || 0) * line.quantity, 0);
+      }, 0);
+      
+      const currentMonth = new Date();
+      currentMonth.setDate(1);
+      currentMonth.setHours(0, 0, 0, 0);
+      const thisMonthRevenue = paidCompletedOrders
+        .filter((o) => new Date(o.createdAt) >= currentMonth)
+        .reduce((sum, o) => {
+          return sum + o.items.reduce((itemSum, line) => itemSum + (line.unitPrice || 0) * line.quantity, 0);
+        }, 0);
+      
+      // Generate monthly revenue data for chart (last 6 months)
+      const revenueByMonth = [];
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const now = new Date();
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthName = monthNames[d.getMonth()];
+        const monthStart = new Date(d.getFullYear(), d.getMonth(), 1);
+        const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59, 999);
+        
+        const monthRevenue = paidCompletedOrders
+          .filter((o) => {
+            const orderDate = new Date(o.createdAt);
+            return orderDate >= monthStart && orderDate <= monthEnd;
+          })
+          .reduce((sum, o) => {
+            return sum + o.items.reduce((itemSum, line) => itemSum + (line.unitPrice || 0) * line.quantity, 0);
+          }, 0);
+        
+        revenueByMonth.push({ month: monthName, revenue: monthRevenue });
+      }
+      
       return {
         business: b, completion: completion(s, b), itemCount: b ? s.items.filter((i) => i.businessId === b.id).length : 0,
         newOrders: orders.filter((o) => o.status === "NEW").length,
         outstandingOrders: orders.filter((o) => o.status !== "COMPLETED" && o.status !== "CANCELLED").length,
         recentOrders: orders.slice(0, 5), checklist: { done: list.filter((c) => c.done).length, total: list.length },
+        analytics: { totalRevenue, thisMonthRevenue, revenueByMonth },
       };
     },
   },

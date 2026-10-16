@@ -25,6 +25,7 @@ class OrderRequest(models.Model):
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.NEW)
     # Recorded manually by the owner only. Never derived from customer input, messages or screenshots.
     payment_status = models.CharField(max_length=6, choices=Payment.choices, default=Payment.UNPAID)
+    payment_method = models.CharField(max_length=30, blank=True, help_text="Payment method used (PAYSTACK, CASH_ON_DELIVERY, MANUAL_MOBILE_MONEY)")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
