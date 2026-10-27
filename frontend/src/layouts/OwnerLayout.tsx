@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { ClipboardList, ExternalLink, LayoutDashboard, LogOut, Package, Settings, ShieldCheck, Store, Wallet } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
@@ -11,6 +12,7 @@ import { Badge } from "@/components/common/States";
 import { ConfirmDialog } from "@/components/common/Modal";
 
 export function OwnerLayout() {
+  const { t } = useTranslation();
   const me = useMe();
   const biz = useBusiness();
   const orders = useOrders();
@@ -21,17 +23,17 @@ export function OwnerLayout() {
   const newCount = (orders.data ?? []).filter((o) => o.status === "NEW").length;
 
   const links = [
-    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/business", label: "My storefront", icon: Store },
-    { to: "/business/catalog", label: "Catalog", icon: Package },
-    { to: "/orders", label: "Orders", icon: ClipboardList, badge: newCount },
-    { to: "/payments", label: "Payments", icon: Wallet },
-    { to: "/security", label: "Security centre", icon: ShieldCheck },
-    { to: "/settings", label: "Settings", icon: Settings },
+    { to: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
+    { to: "/business", label: t("business.myStorefront"), icon: Store },
+    { to: "/business/catalog", label: t("business.catalog"), icon: Package },
+    { to: "/orders", label: t("orders.orders"), icon: ClipboardList, badge: newCount },
+    { to: "/payments", label: t("common.save"), icon: Wallet },
+    { to: "/security", label: t("security.securityCentre"), icon: ShieldCheck },
+    { to: "/settings", label: t("settings.settings"), icon: Settings },
   ];
   const mobile = [links[0], links[2], links[3], links[4], links[5], links[6]];
 
-  const doLogout = async () => { await logout.mutateAsync(); toast("You have signed out."); nav("/"); };
+  const doLogout = async () => { await logout.mutateAsync(); toast(t("auth.welcomeBack")); nav("/"); };
 
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[17rem_1fr]">
@@ -53,7 +55,7 @@ export function OwnerLayout() {
         <div className="space-y-3">
           <LanguageSwitcher />
           <p className="text-xs text-navy-300">Signed in as {me.data?.email}</p>
-          <button onClick={() => setConfirm(true)} className="flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 font-semibold hover:bg-white/10"><LogOut className="h-5 w-5" aria-hidden />Sign out</button>
+          <button onClick={() => setConfirm(true)} className="flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 font-semibold hover:bg-white/10"><LogOut className="h-5 w-5" aria-hidden />{t("dashboard.signOut")}</button>
         </div>
       </aside>
 
@@ -62,7 +64,7 @@ export function OwnerLayout() {
           <div className="flex min-w-0 items-center gap-3">
             <div className="lg:hidden"><Link to="/dashboard" aria-label="Dashboard"><img src="/favicon.svg" alt="" className="h-8 w-8" /></Link></div>
             <p className="truncate font-semibold">{biz.data?.name ?? "Welcome"}</p>
-            {biz.data && <Badge tone={biz.data.status === "PUBLISHED" ? "green" : "amber"}>{biz.data.status === "PUBLISHED" ? "Published" : "Draft"}</Badge>}
+            {biz.data && <Badge tone={biz.data.status === "PUBLISHED" ? "green" : "amber"}>{biz.data.status === "PUBLISHED" ? t("dashboard.published") : t("dashboard.draft")}</Badge>}
           </div>
           {biz.data && (
             <Link to={`/store/${biz.data.slug}${biz.data.status === "DRAFT" ? "?preview=1" : ""}`} className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-lagoon-800 hover:bg-lagoon-50">
@@ -81,7 +83,7 @@ export function OwnerLayout() {
           {mobile.map((l) => (
             <li key={l.to}>
               <NavLink to={l.to} className={({ isActive }) => cn("relative flex min-h-[56px] flex-col items-center justify-center gap-0.5 text-[11px] font-semibold", isActive ? "text-lagoon-800" : "text-ocean-600")}>
-                <l.icon className="h-5 w-5" aria-hidden />{l.label === "Security centre" ? "Security" : l.label}
+                <l.icon className="h-5 w-5" aria-hidden />{l.label === t("security.securityCentre") ? t("nav.security") : l.label}
                 {l.badge ? <span className="absolute right-4 top-1.5 h-2.5 w-2.5 rounded-full bg-coral-500" aria-label={`${l.badge} new`} /> : null}
               </NavLink>
             </li>
@@ -89,7 +91,7 @@ export function OwnerLayout() {
         </ul>
       </nav>
 
-      <ConfirmDialog open={confirm} onClose={() => setConfirm(false)} onConfirm={doLogout} loading={logout.isPending} title="Sign out?" message="You will need to sign in again to manage your storefront." confirmLabel="Sign out" />
+      <ConfirmDialog open={confirm} onClose={() => setConfirm(false)} onConfirm={doLogout} loading={logout.isPending} title={t("dashboard.signOutConfirm")} message={t("dashboard.signOutMessage")} confirmLabel={t("dashboard.signOut")} />
     </div>
   );
 }
